@@ -1,8 +1,6 @@
-from pylab import figure, show, rand
-from matplotlib.patches import Ellipse
+from pylab import figure, show
 import matplotlib as mpl
 import numpy as np
-import math
 from numpy import *
 
 
