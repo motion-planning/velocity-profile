@@ -1,10 +1,10 @@
-from pylab import figure, show, rand
-from matplotlib.patches import Ellipse
+import itertools
+
 import matplotlib as mpl
 import numpy as np
-import math
+from matplotlib.patches import Ellipse
 from numpy import *
-import itertools
+from pylab import figure, show
 
 
 def perp(a):
@@ -12,6 +12,7 @@ def perp(a):
     b[0] = -a[1]
     b[1] = a[0]
     return b
+
 
 # line segment a given by endpoints a1, a2
 # line segment b given by endpoints b1, b2
@@ -41,7 +42,7 @@ def ellipse_general_to_standard(A, B, C, D, E, F):
     Parameters: A, B, C, D, E, F
     Returns: x0, y0, a, b, t
     """
-    A, B, C, D, E, F = map(float, [A, B, C, D, E, F])
+    A, B, C, D, E, F = list(map(float, [A, B, C, D, E, F]))
     # Matrix representation of conic section
     AQ = np.array([[A, B / 2, D / 2], [B / 2, C, E / 2], [D / 2, E / 2, F]])
     A33 = AQ[0:2, 0:2]
@@ -111,7 +112,7 @@ def rearrangeObstacleLines(obstacle, basetimeObstacle, velocityObstacle):
     # obstacle is
     newLength = velocityObstacle * basetimeObstacle - length
     slope = (obstacleLine[3] - obstacleLine[1]) / \
-        (0.0001 + obstacleLine[2] - obstacleLine[0])
+            (0.0001 + obstacleLine[2] - obstacleLine[0])
     # coordinate of the obstacle on the current line it will be the starting
     # point of the obstacle now.
     xnew = math.sqrt(newLength ** 2 / (1 + slope ** 2)) + obstacleLine[0]
@@ -134,20 +135,21 @@ def rearrangeObstacleLines(obstacle, basetimeObstacle, velocityObstacle):
 
 def lineIntersection(line1, line2):
     value1 = (line1[2] - line1[0]) * (line2[1] - line1[3]) - \
-        (line1[3] - line1[1]) * (line2[0] - line1[2])
+             (line1[3] - line1[1]) * (line2[0] - line1[2])
     value2 = (line1[2] - line1[0]) * (line2[3] - line1[3]) - \
-        (line1[3] - line1[1]) * (line2[2] - line1[2])
+             (line1[3] - line1[1]) * (line2[2] - line1[2])
     value3 = (line2[2] - line2[0]) * (line1[1] - line2[3]) - \
-        (line2[3] - line2[1]) * (line1[0] - line2[2])
+             (line2[3] - line2[1]) * (line1[0] - line2[2])
     value4 = (line2[2] - line2[0]) * (line1[3] - line2[3]) - \
-        (line2[3] - line2[1]) * (line1[2] - line2[2])
-    if ((value1 > 0 and value2 < 0) or (value1 < 0 and value2 > 0)) and ((value3 > 0 and value4 < 0) or (value3 < 0 and value4 > 0)):
-        print "intersection found"
+             (line2[3] - line2[1]) * (line1[2] - line2[2])
+    if ((value1 > 0 and value2 < 0) or (value1 < 0 and value2 > 0)) and (
+                (value3 > 0 and value4 < 0) or (value3 < 0 and value4 > 0)):
+        print("intersection found")
         p1 = array([line1[0], line1[1]])
         p2 = array([line1[2], line1[3]])
         p3 = array([line2[2], 0])
         p4 = array([line2[2], line2[3]])
-        print line1, line2
+        print(line1, line2)
         return seg_intersect(p1, p2, p3, p4)
     return -1, -1
 
@@ -165,7 +167,7 @@ def velocityProfile(robotLineSpaceTimeX, robotLineSpaceTimeY, robotLine, rectLis
     # boolean variable to check if any intersection with any obstacle is found
     # or not. initialize it with false as no intersection at the beginning
     intersectionFound = False
-    print 'linespacetime', lineinSpaceTime
+    print('linespacetime', lineinSpaceTime)
     # for each rectangular obstacle we must check for possible intersection
     for rect in rectList:
         # represents one of the four lines of the rectangular obstacle.this one
@@ -175,7 +177,7 @@ def velocityProfile(robotLineSpaceTimeX, robotLineSpaceTimeY, robotLine, rectLis
         # found it returns -1,-1
         x, y = lineIntersection(lineinSpaceTime, lineinSpaceTime1)
         if x != -1:
-            print 'x,y', x, y
+            print('x,y', x, y)
             # set the boolean variable true that an intersection has been found
             intersectionFound = True
             # append a line into the velocity list.the startpoint of this line
@@ -188,7 +190,7 @@ def velocityProfile(robotLineSpaceTimeX, robotLineSpaceTimeY, robotLine, rectLis
             robotLineSpaceTimeX = x
             robotLineSpaceTimeY = rect[1]
             lineEndY = ((lineEndY - y) / (lineEndX - x)) * \
-                (lineEndX - rect[0]) + rect[1]
+                       (lineEndX - rect[0]) + rect[1]
             lineinSpaceTime = [
                 robotLineSpaceTimeX, robotLineSpaceTimeY, lineEndX, lineEndY]
             # print 'new linespacetime',lineinSpaceTime
@@ -200,7 +202,7 @@ def velocityProfile(robotLineSpaceTimeX, robotLineSpaceTimeY, robotLine, rectLis
         # found it returns -1,-1
         x, y = lineIntersection(lineinSpaceTime, lineinSpaceTime1)
         if x != -1:
-            print 'x,y', x, y
+            print('x,y', x, y)
             intersectionFound = True
             # append a line into the velocity list.the startpoint of this line
             # is the startpoint of the robot on this line.the endpoint of this
@@ -210,7 +212,7 @@ def velocityProfile(robotLineSpaceTimeX, robotLineSpaceTimeY, robotLine, rectLis
             robotLineSpaceTimeX = x
             robotLineSpaceTimeY = rect[1]
             lineEndY = ((lineEndY - y) / (lineEndX - x)) * \
-                (lineEndX - rect[0]) + rect[1]
+                       (lineEndX - rect[0]) + rect[1]
             lineinSpaceTime = [
                 robotLineSpaceTimeX, robotLineSpaceTimeY, lineEndX, lineEndY]
             velocityLineList.append([x, y, x, rect[1]])
@@ -228,7 +230,8 @@ def velocityProfile(robotLineSpaceTimeX, robotLineSpaceTimeY, robotLine, rectLis
     return robotLineSpaceTimeX, robotLineSpaceTimeY, velocityLineList
 
 
-def findEllipse(lineObstacle, lineRobot, velocityObstacle, basetimeObstacle, basetimeRobot, obstacleStartX, obstacleStartY, lineObstacleIndex, stopMove):
+def findEllipse(lineObstacle, lineRobot, velocityObstacle, basetimeObstacle, basetimeRobot, obstacleStartX,
+                obstacleStartY, lineObstacleIndex, stopMove):
     # initialize for initial point checking of obstacle. after each robot line
     # solved,an obstacle has changed its position over time.
     tempx = 0
@@ -250,7 +253,7 @@ def findEllipse(lineObstacle, lineRobot, velocityObstacle, basetimeObstacle, bas
     yc = lineObstacle[1]
     # calculate slope for the obstacle line
     slope = (lineObstacle[3] - lineObstacle[1]) / \
-        (0.0001 + lineObstacle[2] - lineObstacle[0])
+            (0.0001 + lineObstacle[2] - lineObstacle[0])
     # calculate Vx from the V for obstacle
     vx = math.sqrt(velocityObstacle ** 2 / (1 + slope ** 2))
     # calculate Vy from the V for obstacle
@@ -300,15 +303,14 @@ def findEllipse(lineObstacle, lineRobot, velocityObstacle, basetimeObstacle, bas
     # for stop move robot, add the interval if the obstacle calculated
     # hight(time) is after all the waiting times
     for time in stopMove:
-        if(centery > time[0]):
+        if (centery > time[0]):
             centery = centery + time[1] - time[0]
 
-    print centerx, centery, h, w * math.sqrt(a * a + b * b), t, basetimeObstacle
+    print(centerx, centery, h, w * math.sqrt(a * a + b * b), t, basetimeObstacle)
     return centerx, centery, h, w * math.sqrt(a * a + b * b), t, basetimeObstacle
 
 
 class MovingObject:
-
     def __init__(self, trajectory, velocity, startTime, positionX, positionY, stopMove):
         self.trajectory = trajectory
         self.cloneTrajectory = trajectory
@@ -323,11 +325,11 @@ def main():
     obstacle1 = MovingObject([[-10, 0, 20, 0]], 1, 0, 0, 0, [[0, 0]])
     obstacle2 = MovingObject([[-5, -8, 10, 17]], 1, 0, 0, 0, [[0, 0]])
     obstacle3 = MovingObject([[0, 17, 15, -8]], 1, 0, 0, 0, [[0, 0]])
-    obstacleList = [obstacle1]
+    obstacleList = [obstacle1, obstacle2, obstacle3]
 
-#     robot = [[-10, 0, 20, 0]]
+    #     robot = [[-10, 0, 20, 0]]
     robot = [[-5, -8.66025, 10, 17.3205]]
-#     robot = [[0, 17, 15, -8]]
+    #     robot = [[0, 17, 15, -8]]
     baseSpaceRobot = 0
     velocityRobot = 1
     fig = figure()
@@ -337,17 +339,20 @@ def main():
     velocityLineList = []
 
     for robotLine in robot:  # for all the robot lines
-        print "####################################new run###################################"
+        print("####################################new run###################################")
 
-        print robotLine
+        print(robotLine)
 
         for obstacle in obstacleList:  # for all the obstacles
             lineObstacleIndex = 0
-            print obstacle.trajectory, "obstacle position on line", obstacle.positionX, obstacle.positionY, "baseSpaceRobot,basetimeObstacle", baseSpaceRobot, obstacle.startTime
+            print(obstacle.trajectory, "obstacle position on line", obstacle.positionX, obstacle.positionY,
+                  "baseSpaceRobot,basetimeObstacle", baseSpaceRobot, obstacle.startTime)
             # for all the obstacle lines for current obstacle
             for obstacleLine in obstacle.trajectory:
                 centerx, centery, h, w, t, obstacle.startTime = findEllipse(
-                    obstacleLine, robotLine, obstacle.velocity, obstacle.startTime, baseSpaceRobot, obstacle.positionX, obstacle.positionY, lineObstacleIndex, obstacle.stopMove)  # calculate the elliptical obstacle in s-t space
+                    obstacleLine, robotLine, obstacle.velocity, obstacle.startTime, baseSpaceRobot, obstacle.positionX,
+                    obstacle.positionY, lineObstacleIndex,
+                    obstacle.stopMove)  # calculate the elliptical obstacle in s-t space
                 if h != 0:
                     # if this is a valid ellipse then add in the ellipse list
                     ellipseList.append([centerx - w / 2, centery + h / 2, centerx - w / 2, centery -
@@ -362,7 +367,8 @@ def main():
                 lineObstacleIndex = lineObstacleIndex + 1
         ellipseList.sort()  # sort all ellipses by X axis in s-t space
         robotLineSpaceTimeX, robotLineSpaceTimeY, velocityLineList = velocityProfile(
-            robotLineSpaceTimeX, robotLineSpaceTimeY, robotLine, ellipseList, velocityRobot, velocityLineList)  # calculate  the lines in s-t space
+            robotLineSpaceTimeX, robotLineSpaceTimeY, robotLine, ellipseList, velocityRobot,
+            velocityLineList)  # calculate  the lines in s-t space
         # update the robot position as robot completed current line
         baseSpaceRobot += calculateLineLength(robotLine)
         # update the position of all the obstacles after the robot finishing
@@ -397,7 +403,7 @@ def main():
         fig.gca().plot(
             (line[0], line[2]), (line[1], line[3]), 'go-', label='line 1', linewidth=2)
 
-    print tempvelocityLineList
+    print(tempvelocityLineList)
     ax.set_xlim(0, baseSpaceRobot + 20)
     ax.set_ylim(0, obstacle.startTime + 20)
     show()
@@ -405,4 +411,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    
